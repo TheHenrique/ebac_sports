@@ -1,23 +1,42 @@
-import { useSelector } from 'react-redux'
-import { RootState } from '../../store'
 import * as S from './styles'
-import cesta from '../../assets/cesta.png'
 
-const Header = () => {
-  const itensNoCarrinho = useSelector((state: RootState) => state.carrinho.itens)
+import { Produto } from '../../App'
+
+import cesta from '../../assets/cesta.png'
+import { paraReal } from '../Produto'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../store'
+import { clearCart } from '../../src/store/cartSlice'
+
+type Props = {
+  favoritos: Produto[]
+}
+
+const Header = ({ favoritos }: Props) => {
+  const dispatch = useDispatch()
+  const itensNoCarrinho = useSelector(
+    (state: RootState) => state.cart.items
+  ) as Produto[]
 
   const valorTotal = itensNoCarrinho.reduce((acc, item) => {
-    return acc + item.preco
+    acc += item.preco
+    return acc
   }, 0)
 
   return (
     <S.Header>
       <h1>EBAC Sports</h1>
       <div>
-        <span>{itensNoCarrinho.length} itens, valor total: {
-          new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorTotal)
-        }</span>
-        <img src={cesta} alt="Carrinho" />
+        <span>{favoritos.length} favoritos</span>
+        <img src={cesta} />
+        <span>
+          {itensNoCarrinho.length} itens, valor total: {paraReal(valorTotal)}
+        </span>
+        {itensNoCarrinho.length > 0 && (
+          <S.ClearButton onClick={() => dispatch(clearCart())} type="button">
+            Limpar carrinho
+          </S.ClearButton>
+        )}
       </div>
     </S.Header>
   )
